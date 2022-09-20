@@ -2,6 +2,11 @@ from django.db.models import Count
 from rest_framework import serializers
 from mailing_app.models import Client, Mailing, Message
 
+
+# create logger (is configured in SETTINGS)
+import logging
+logger = logging.getLogger(__name__)
+
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
@@ -14,8 +19,20 @@ class MailingSerializer(serializers.ModelSerializer):
 
     def get_messages_stats(self, instance):
         mailing_pk = instance.pk
+        stats_dict = {
+            0: 0,
+            1: 0,
+            2: 0
+        }
+
         stats = Message.objects.filter(from_mailing=mailing_pk).values('status').order_by('status').annotate(total=Count('status'))
-        return stats #instance.business_account.feedbackmodel_set.aggregate(average_rating=('rating'))['average_rating']
+        for s in stats:
+            #logger.info(f'Statistic data for mailing is {s}')
+            #logger.info(f'Status is {s["status"]}')
+            #logger.info(f'Number is {s["total"]}')
+            stats_dict[s["status"]] = s["total"]
+
+        return stats_dict
 
     class Meta:
         model = Mailing

@@ -6,13 +6,12 @@ from rest_framework import status
 from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, GenericAPIView
 
-import logging
-
 from mailing_app.models import Client, Message, Mailing
 from mailing_app.serializers import ClientSerializer, MailingSerializer, MessageSerializer
 
 
 # create logger (is configured in SETTINGS)
+import logging
 logger = logging.getLogger(__name__)
 
 # Views for client API
@@ -38,7 +37,7 @@ class MailingData(ListModelMixin, CreateModelMixin, GenericAPIView):
         serializer = MailingSerializer(data=mailing_data)
         serializer.is_valid(raise_exception=True)
         current_mailing = serializer.save()
-        logger.info(f'Current mailing text is {current_mailing.text}')
+        logger.info(f'Current mailing text is "{current_mailing.text}"')
 
         try:
             tag_to_filter = serializer.validated_data['filter_tag'] or None
