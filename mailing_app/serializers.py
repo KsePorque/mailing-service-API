@@ -11,7 +11,6 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = "__all__"
-        #readonly = ["modified_at", "created_at"]
 
 
 class MailingSerializer(serializers.ModelSerializer):
@@ -38,6 +37,7 @@ class MailingSerializer(serializers.ModelSerializer):
         model = Mailing
         fields = ['id','started_at', 'ended_at', 'text', 'filter_tag', 'filter_code'] # "__all__"
         fields += ['messages_stats']
+        readonly = ['messages_stats', 'id']
 
 
 class MessageSerializer(serializers.ModelSerializer):

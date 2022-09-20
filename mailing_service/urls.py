@@ -47,5 +47,5 @@ urlpatterns = [
     path('api/v1/mailings/stats', MailingDataStats.as_view()),
     path('api/v1/mailings/<int:pk>', MailingDataDetail.as_view()),
     path('api/v1/mailings/<int:pk>/stats', MailingDataDetailStats.as_view()),
-    #path('api/v1/messages', MessageData.as_view()),
+
 ]

@@ -89,7 +89,7 @@ class MailingDataDetailStats(APIView):
 
     def get(self, request, pk=None, *args, **kwargs):
         id = pk or request.query_params.get('id')
-        messages = Message.objects.filter(from_mailing=id).filter(status=1).distinct().select_related()
+        messages = Message.objects.filter(from_mailing=id)
         serializer = MessageSerializer(messages, many=True)
         return Response(serializer.data)
 

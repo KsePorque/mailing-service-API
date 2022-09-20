@@ -3,16 +3,11 @@ import pytz  #for timezones
 from django.utils.timezone import make_aware
 from django.db import models
 from django.core.validators import RegexValidator
+from django.conf import settings
 
 # Models for mailing lists
 class Client(models.Model):
-    TIMEZONES = (
-        'Canada/Atlantic',
-        'Canada/Central',
-        'Canada/Eastern',
-        'Canada/Mountain',
-        'Canada/Pacific',
-    )
+    #TIMEZONES = pytz.all_timezones()
 
     phone_regex = RegexValidator(regex=r'7\d{10}$',
                                  message="Phone number format must be: '7XXXXXXXXXX'. Where X is digit from 0 to 9.")
@@ -20,7 +15,7 @@ class Client(models.Model):
     phone_number = models.CharField(validators=[phone_regex], max_length=11, blank=False)
     phone_code = models.IntegerField(default=7)
     tag = models.CharField(max_length=50, blank=True, null=True)
-    #time_zone = models.CharField(max_length=100, blank=True, null=True, choices=TIMEZONES)  # 64 min
+    time_zone = models.CharField(default=settings.TIME_ZONE, max_length=100, blank=True, null=True) #, choices=TIMEZONES)
 
     def __str__(self):
         return (f'{self.phone_number} - {self.tag}')
