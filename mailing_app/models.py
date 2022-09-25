@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-import pytz  #for timezones
+#import pytz  #for timezones
 from django.utils.timezone import make_aware
 from django.db import models
 from django.core.validators import RegexValidator

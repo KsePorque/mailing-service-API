@@ -14,20 +14,10 @@ import aiohttp
 import logging
 logger = logging.getLogger(__name__)
 
-
 async def post__send_message(session, url, headers, message):
-    logger.info("Inside the post__send_message function")
-
-    message_id = message.pk
-    logger.info(f"message id: {message_id}")
-
-    message_from_mailing = await sync_to_async(lambda: message.from_mailing)()
-    message_text = message_from_mailing.text
-    #logger.info(f"message_text: {message_text}")
-
-    message_to_client = await sync_to_async(lambda: message.to_client)()
-    message_phone = message_to_client.phone_number
-    logger.info(f"message_phone: {message_phone}")
+    message_id = sync_to_async(message.pk)
+    message_phone = sync_to_async(message.to_client.phone_number)
+    message_text = sync_to_async(message.from_mailing.text)
 
     data = {
         "id": message_id,
@@ -35,19 +25,17 @@ async def post__send_message(session, url, headers, message):
         "text": message_text
     }
 
-    url_message = url + str(message_id)
-    #logger.info(f'url_message {url_message}')
-    async with session.post(url_message, json=data, headers=headers) as response:
-        resp_status_code = response.status
+    async with session.post(url.join(message_id), json=data, headers=headers) as response:
+        resp_status_code = sync_to_async(response.status_code)
         if resp_status_code == 200:
             message.status = 1
-            await sync_to_async(message.save)()
+            sync_to_async(message.save())
         elif resp_status_code == 400:
             message.status = 0
-            await sync_to_async(message.save)()
+            sync_to_async(message.save())
 
-        logger.info(f'Response status code: {response.status}')
-        #logger.info(f'Response: {response.json()}')
+        logger.info(f'Response status code: {response.status_code}')
+        logger.info(f'Response: {response.json()}')
 
 
 async def send_messages_for_mailing(pending_messages):
@@ -62,15 +50,10 @@ async def send_messages_for_mailing(pending_messages):
 
     async with aiohttp.ClientSession() as session:
         url_api = 'https://probe.fbrq.cloud/v1/send/'
-        #logger.info(f'url_api: {url_api}')
         for message in pending_messages:
-            #logger.info(f'Message: {message}')
+            actions.append(asyncio.ensure_future(post__send_message(session, url_api, headers=headers, message=message)))
 
-            task = asyncio.create_task(post__send_message(session, url_api, headers=headers, message=message))
-            # task = asyncio.ensure_future(post__send_message(session, url_api, headers=headers, message=message))
-            actions.append(task)
-
-        return await asyncio.gather(*actions)
+        post_res = await asyncio.gather(*actions)
 
 
 
@@ -88,7 +71,6 @@ def check_for_pending_messages():
 
     logger.info(f"Pending messages: {pending_messages}")
 
-    pending_messages_lst = list(pending_messages)
-    asyncio.run(send_messages_for_mailing(pending_messages_lst))
+    asyncio.run(send_messages_for_mailing(pending_messages))
 
 
