@@ -24,7 +24,7 @@ class Mailing(models.Model):
     curr_time = datetime.today()
     end_time = make_aware(curr_time + timedelta(seconds=600))
 
-    started_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(default=curr_time)  #auto_now_add=True)
     ended_at = models.DateTimeField(default=end_time)
     text = models.TextField(max_length=500)
     filter_code = models.IntegerField(blank=True, null=True)

@@ -64,6 +64,7 @@ class MailingData(ListModelMixin, CreateModelMixin, GenericAPIView):
             new_messages.append(Message(to_client=client, from_mailing=current_mailing, status=2))
         Message.objects.bulk_create(new_messages)
         logger.info(f'Number of pending messages generated: {len(new_messages)}')
+        #logger.info(f"Messages with status = 2 - in views: {Message.objects.filter(status=2)}")
 
         return Response(serializer.data)
 

@@ -3,7 +3,7 @@ import requests
 
 from django.utils.timezone import make_aware
 from django.conf import settings
-#from django.db.models import Q
+from django.db.models import Count
 from mailing_app.models import Client, Message, Mailing
 
 from asgiref.sync import sync_to_async
@@ -86,9 +86,24 @@ def check_for_pending_messages():
     # Only send messages if mailing is started and task is pending
     pending_messages = Message.objects.filter(status=2).filter(from_mailing__started_at__lte=curr_time)
 
-    logger.info(f"Pending messages: {pending_messages}")
+    # logging stats data
+    stats = Message.objects.all().values('status').order_by('status').annotate(total=Count('status'))
+    stats_dict = { 0: 0, 1: 0, 2: 0}
+    for s in stats:
+        stats_dict[s["status"]] = s["total"]
+
+    logger.info(f"All messages count: {sum(stats_dict.values())}")
+    logger.info(f"Number of pending messages (with status = 2): {stats_dict[2]}")
+    logger.info(f"Number of sent messages (with status = 1): {stats_dict[1]}")
+    logger.info(f"Number of not sent messages (with status = 0): {stats_dict[0]}")
+
+    logger.info(f"Current time is {curr_time}\n")
 
     pending_messages_lst = list(pending_messages)
+    logger.info(f"Messages that will be send now: {pending_messages}")
+    if pending_messages:
+        logger.info(f'mailing start time {pending_messages[0].from_mailing.started_at}')
+
     asyncio.run(send_messages_for_mailing(pending_messages_lst))
 
 

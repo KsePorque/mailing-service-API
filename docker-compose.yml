@@ -3,17 +3,25 @@ services:
     web:
         build: .
         command: python manage.py runserver 0.0.0.0:8080
+        volumes: 
+            - .:/app
         ports:
             - 8080:8080
         depends_on:
             - migration
-            
+    
+      
     migration:
         build: .
         command: python manage.py migrate --noinput
+        volumes: 
+            - .:/app
         
     task_crawler:
         build: .
+        working_dir: /app
         command: python manage.py runscript crawler
+        volumes: 
+            - .:/app
         depends_on:
             - web
