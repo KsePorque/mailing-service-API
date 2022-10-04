@@ -53,6 +53,12 @@
 В некоторых модулях создан logger для выведения сообщений. Я использовала для отладки<br> 
 Сейчас в настройках проекта логгер настроен на вывод в терминал 
 
+## Тестирование 
+(пока только для clients API)<br>
+Использованы unit tests с использованием APITestCase и django TestCase.<br>
+Для запуска: <br>
+* API: python manage.py test tests.test_api
+* serializers: python manage.py test tests.test_serializers
 
 
 

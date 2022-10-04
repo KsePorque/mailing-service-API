@@ -41,11 +41,11 @@ urlpatterns = [
     path('api/v1/docs/', schema_view.with_ui('swagger', cache_timeout=0),
          name='schema-swagger-ui'),
 
-    path('api/v1/clients', ClientData.as_view()),
-    path('api/v1/clients/<int:pk>', ClientDataDetail.as_view()),
-    path('api/v1/mailings', MailingData.as_view()),
-    path('api/v1/mailings/stats', MailingDataStats.as_view()),
-    path('api/v1/mailings/<int:pk>', MailingDataDetail.as_view()),
-    path('api/v1/mailings/<int:pk>/stats', MailingDataDetailStats.as_view()),
+    path('api/v1/clients/', ClientData.as_view(), name='client-list'),
+    path('api/v1/clients/<int:pk>', ClientDataDetail.as_view(), name='client-detail'),
+    path('api/v1/mailings/', MailingData.as_view(), name='mailing-list'),
+    path('api/v1/mailings/stats/', MailingDataStats.as_view()),
+    path('api/v1/mailings/<int:pk>/', MailingDataDetail.as_view(), name='mailing-detail'),
+    path('api/v1/mailings/<int:pk>/stats/', MailingDataDetailStats.as_view(), name='mailing-detail-stats'),
 
 ]
