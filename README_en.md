@@ -1,15 +1,18 @@
 ... EN version is in progress ...
 # Mailing Service
-Mailing service API <br>
-Functionality: REST API, Swagger UI, Admin Console (basic), Logging<br>
-<b>UPD:</b> docker creation files added (is launched on localhost:8080) 
+**Idea**: Mailing is sending specific messages to selected users in specific period of time. For example, you may want to send "Welcome"-message to all the users that are marked with tag New in the database. Or send "You may upgrade for free" message for the old users, but this mailing should start tomorrow and last for 2 days. <br>
+This mailing service API is managing all the mailings you have registered to ensure that all messages are sent in time and to proper users<br>
+Third-party API is called to send the message: https://probe.fbrq.cloud/docs <br>
+<br>
+**Functionality**: REST API, Swagger UI, Admin Console (basic), Logging<br>
+**UPD**: docker creation files added (is launched on localhost:8080) 
 
-**Logic**: Every 5 seconds the system checks whether there are messages with status Pending (waiting for email sending). 
+**Logic**: Every 5 seconds the system checks whether there are messages with status Pending (waiting for sending). 
 - For Pending messages: checking the start and end time of the mailing
-- For Pending messages that can be sent now: Send-email task is created
-- For non-relevant messages (messages that for some reason haven't been sent): status is changed to not-sent.
-- If email-sending service returns 400: message status is changed to not sent (and is not resent)
-- If email-sending service returns other error code (service malfunction occurred): task remains in Pending status (may be resent later)
+- For Pending messages that can be sent now (time is correct): message-sending task is created
+- For non-relevant messages (messages that for some reason haven't been sent): status is changed to not-sent
+- If message-sending service returns 400: message status is changed to not sent (and it would not be resent)
+- If message-sending service returns other error code (temporal service malfunction occurred): task remains in Pending status (may be resent later)
 
 
 
@@ -18,12 +21,27 @@ Django Rest Framework, SQLite
 
 # Project Details
 ## Database model
-Database Tables:
-* Mailing = info about mailing
-* Client = info about client
-* Message = a message: 
-        - has 2 foreign keys connecting with Mailing and Client tables<br>
-        - possible statuses: sent, not sent, pending
+Database Tables:  <br> <br>
+**Mailing** (info about mailing)<br>
+* **id**: unique identifier 
+* **start time**: messages should only be sent after this time <br>
+* **message**: message that should be sent to clients <br>
+* **filter** (tag, phone code): defines clients that should receive the message <br>
+* **end time**: no messages should be sent after this time even if not all messages were sent <br>
+
+**Client** (info about client) <br>
+* **id**: unique identifier 
+* **phone number**: format 7XXXXXXXXXX (X is 0-9) <br>
+* **phone code**: the code of the operator <br>
+* **tag**: any tag for filtering (for example, new/old/etc) <br>
+* **time zone**
+
+**Message** (represents a message to a specific client with a specific text):  <br>
+* **id**: unique identifier of the message  <br>
+* **creation time**: time when the message was created  <br>
+* **status**: possible statuses are sent, not sent, pending  <br>
+* **client id** (foreign key): id of the client  <br>
+* **mailing id** (foreign key): id of the corresponding mailing   <br>
 
 ## Admin Console
 Is accessible via /admin/
@@ -53,7 +71,7 @@ To launch: <br>
 # Run Project
 - Install requirements from requirements.txt: pip install -r requirements.txt
 - Apply migrations: python manage.py migrate
-- Install environmental variable FBRQ_TOKEN (in file .env). This variable contains the authentication token for mail-sending service: https://probe.fbrq.cloud/docs <br>
+- Install environmental variable FBRQ_TOKEN (in file .env). This variable contains the authentication token for message-sending service: https://probe.fbrq.cloud/docs <br>
 - Run the server: python manage.py runserver 127.0.0.1:8080
 - Start automatic mailing tasks creation (to send emails with message from the mailing) - see steps below <br>
 
