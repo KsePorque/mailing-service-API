@@ -1,4 +1,3 @@
-... EN version is in progress ...
 # Mailing Service
 **Idea**: Mailing is sending specific messages to selected users in specific period of time. For example, you may want to send "Welcome"-message to all the users that are marked with tag New in the database. Or send "You may upgrade for free" message for the old users, but this mailing should start tomorrow and last for 2 days. <br>
 This mailing service API is managing all the mailings you have registered to ensure that all messages are sent in time and to proper users<br>
@@ -8,11 +7,11 @@ Third-party API is called to send the message: https://probe.fbrq.cloud/docs <br
 **UPD**: docker creation files added (is launched on localhost:8080) 
 
 **Logic**: Every 5 seconds the system checks whether there are messages with status Pending (waiting for sending). 
-- For Pending messages: checking the start and end time of the mailing
-- For Pending messages that can be sent now (time is correct): message-sending task is created
-- For non-relevant messages (messages that for some reason haven't been sent): status is changed to not-sent
-- If message-sending service returns 400: message status is changed to not sent (and it would not be resent)
-- If message-sending service returns other error code (temporal service malfunction occurred): task remains in Pending status (may be resent later)
+* For Pending messages: the start and end time of the mailing is checked (to know if its time to send them)
+* For Pending messages that can be sent now (time is correct): message-sending task is created - request to external API
+* For non-relevant messages (messages that for some reason haven't been sent): status is changed to not-sent
+* If message-sending service returns 400: message status is changed to not sent (and it would not be resent)
+* If message-sending service returns other error code (temporal service malfunction occurred): task remains in Pending status (may be resent later)
 
 
 
@@ -44,17 +43,17 @@ Database Tables:  <br> <br>
 * **mailing id** (foreign key): id of the corresponding mailing   <br>
 
 ## Admin Console
-Is accessible via /admin/
+Is accessible via _/admin/_ <br>
 Admin console may be used to add mailings. <br>
 
 ## API Description
-API documentation is available by api/v1/docs/ (Swagger UI)
-- api/v1/clients  - receive the list of clients and add a new one
-- api/v1/clients/<client_id> - get information about the client, modify data, delete client
+API documentation is available by _api/v1/docs/_ (Swagger UI)
+- _api/v1/clients_  - receive the list of clients and add a new one
+- _api/v1/clients/<client_id>_ - get information about the client, modify data, delete client
 
-- api/v1/mailings  - get the list of all mailing lists (includes info about the number of sent messages grouped by message statuses)
-- api/v1/mailings/<mailing_id> - get info about the specific mailing, modify/delete mailing list
-- api/v1/mailings/<mailing_id>/stats - detailed statistics about messages for a mailing list
+- _api/v1/mailings_  - get the list of all mailing lists (includes info about the number of sent messages grouped by message statuses)
+- _api/v1/mailings/<mailing_id>_ - get info about the specific mailing, modify/delete mailing list
+- _api/v1/mailings/<mailing_id>/stats_ - detailed statistics about messages for a mailing list
 
 ## Logging
 (in some modules) Logger is created to record information in the logs. Used for debugging <br> 
