@@ -75,7 +75,9 @@ To launch: <br>
 - Start automatic mailing tasks creation (to send emails with message from the mailing) - see steps below <br>
 
 **Or:** <br>
-- Start docker: docker build mailing_service
+- Start dockers: <br>
+  docker-compose build <br>
+  docker-compose up -d
 
 ## Automatic tasks creation
 As celery is not working on windows, crawler.py may be used to start automatic tasks creation <br>
